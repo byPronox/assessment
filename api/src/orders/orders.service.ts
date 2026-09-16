@@ -65,7 +65,7 @@ export class OrdersService {
     );
 
     // TODO: feeCents should be SERVICE_FEE_PERCENT of subtotalCents, rounded
-    const feeCents = 0;
+    const feeCents = Math.round((subtotalCents * SERVICE_FEE_PERCENT) / 100);
 
     const order: Order = {
       id: `ord_${randomUUID()}`,
