@@ -1,6 +1,12 @@
-import { Navigate, useLocation } from 'react-router';
-import { CheckoutState } from '~/types';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import * as yup from 'yup';
+import { confirmOrder, createOrder, useApiMutation } from '~/api';
+import type { ConfirmOrderBody } from '~/api/endpoints/orders/confirmOrder';
+import type { CreateOrderBody } from '~/api/endpoints/orders/createOrder';
+import { CheckoutState, Order } from '~/types';
 
 /**
  * TODO (frontend)
@@ -30,7 +36,30 @@ const checkoutSchema = yup.object({
 
 export function CheckoutPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const selection = location.state as CheckoutState | null;
+
+  
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [buyerInfo, setBuyerInfo] = useState<ConfirmOrderBody | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CheckoutFormValues>({
+    resolver: yupResolver(checkoutSchema),
+  });
+
+  const { mutateAsync: createOrderRequest, isPending: isCreating } =
+    useApiMutation<Order, Record<string, never>, CreateOrderBody>(createOrder);
+
+  
+  const { mutateAsync: confirmOrderRequest, isPending: isConfirming } =
+    useApiMutation<Order, { id: string }, ConfirmOrderBody>(confirmOrder, {
+      id: orderId ?? '',
+    });
 
   if (!selection?.items.length) {
     return <Navigate to="/" replace />;
