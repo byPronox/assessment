@@ -6,7 +6,7 @@ import * as yup from 'yup';
 import { confirmOrder, createOrder, useApiMutation } from '~/api';
 import type { ConfirmOrderBody } from '~/api/endpoints/orders/confirmOrder';
 import type { CreateOrderBody } from '~/api/endpoints/orders/createOrder';
-import { feeFromSubtotal } from '~/lib/money';
+import { feeFromSubtotal, formatUsd } from '~/lib/money';
 import { CheckoutState, Order } from '~/types';
 
 /**
@@ -34,6 +34,8 @@ const checkoutSchema = yup.object({
     .email('Ingresa un correo válido')
     .required('Ingresa tu correo'),
 });
+
+type CheckoutFormValues = yup.InferType<typeof checkoutSchema>;
 
 export function CheckoutPage() {
   const location = useLocation();
