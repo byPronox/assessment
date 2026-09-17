@@ -101,6 +101,7 @@ export function CheckoutPage() {
           ticketTypeId: item.ticketTypeId,
           quantity: item.quantity,
         })),
+        promoCode: values.promoCode || undefined,
       });
 
       setBuyerInfo(values);

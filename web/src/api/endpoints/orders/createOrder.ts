@@ -3,6 +3,7 @@ import { ApiEndpointFn } from '../../types';
 export type CreateOrderBody = {
   eventId: string;
   items: { ticketTypeId: string; quantity: number }[];
+  promoCode?: string;
 };
 
 export const createOrder: ApiEndpointFn<Record<string, never>, CreateOrderBody> =
