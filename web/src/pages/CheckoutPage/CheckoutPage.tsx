@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router';
 import { CheckoutState } from '~/types';
+import * as yup from 'yup';
 
 /**
  * TODO (frontend)
@@ -16,7 +17,17 @@ import { CheckoutState } from '~/types';
  *
  *   const { mutateAsync: create } = useApiMutation<Order, Record<string, never>, CreateOrderBody>(createOrder);
  *   const { mutateAsync: confirm } = useApiMutation<Order, { id: string }, ConfirmOrderBody>(confirmOrder, { id });
- */
+*/
+
+const checkoutSchema = yup.object({
+  name: yup.string().trim().required('Ingresa tu nombre'),
+  email: yup
+    .string()
+    .trim()
+    .email('Ingresa un correo válido')
+    .required('Ingresa tu correo'),
+});
+
 export function CheckoutPage() {
   const location = useLocation();
   const selection = location.state as CheckoutState | null;
