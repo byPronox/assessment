@@ -1,4 +1,6 @@
 import { Link, useParams } from 'react-router';
+import { orderById, useApiQuery } from '~/api';
+import { Order } from '~/types';
 
 /**
  * TODO (frontend)
@@ -16,6 +18,31 @@ import { Link, useParams } from 'react-router';
  */
 export function ConfirmationPage() {
   const { orderId = '' } = useParams();
+
+  const { data: order, isPending, isError } = useApiQuery<Order>(
+    orderById,
+    { id: orderId },
+    { enabled: Boolean(orderId) },
+  );
+
+  if (isPending) {
+    return (
+      <main className="mx-auto max-w-lg px-4 py-16 text-center text-ink/60">
+        Cargando tu orden…
+      </main>
+    );
+  }
+
+  if (isError || !order) {
+    return (
+      <main className="mx-auto max-w-lg px-4 py-16 text-center">
+        <p>No encontramos esta orden.</p>
+        <Link to="/" className="mt-8 inline-block text-accent">
+          Volver a eventos
+        </Link>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-lg px-4 py-16 text-center">
