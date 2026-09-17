@@ -58,7 +58,7 @@ export class OrdersService {
         );
       }
       seenTicketTypeIds.add(line.ticketTypeId);
-      
+
       ticketType.remaining -= line.quantity;
 
       if (line.quantity > ticketType.maxPerOrder) {
@@ -120,6 +120,10 @@ export class OrdersService {
     const order = this.findById(id);
 
     // TODO: reject when the order is not pending
+
+    if (order.status !== 'pending') {
+      throw new BadRequestException('La orden ya fue confirmada o no está pendiente');
+    }
 
     order.status = 'confirmed';
     order.buyer = { name: dto.name, email: dto.email };
