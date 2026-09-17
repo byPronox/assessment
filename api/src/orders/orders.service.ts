@@ -50,6 +50,18 @@ export class OrdersService {
       // TODO: reject duplicate ticketTypeId values in the same request
       // TODO: decrement ticketType.remaining
 
+      if (line.quantity > ticketType.maxPerOrder) {
+        throw new BadRequestException(
+          `No puedes comprar más de ${ticketType.maxPerOrder} entradas de "${ticketType.name}" por orden`,
+        );
+      }
+
+      if (line.quantity > ticketType.remaining) {
+        throw new BadRequestException(
+          `No quedan suficientes entradas de "${ticketType.name}"`,
+        );
+      }
+
       return {
         ticketTypeId: ticketType.id,
         name: ticketType.name,
