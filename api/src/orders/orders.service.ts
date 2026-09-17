@@ -37,6 +37,8 @@ export class OrdersService {
       throw new NotFoundException('Evento no encontrado');
     }
 
+    const seenTicketTypeIds = new Set<string>();
+
     const items = dto.items.map((line) => {
       const ticketType = event.ticketTypes.find(
         (type) => type.id === line.ticketTypeId,
@@ -50,6 +52,13 @@ export class OrdersService {
       // TODO: reject duplicate ticketTypeId values in the same request
       // TODO: decrement ticketType.remaining
 
+      if (seenTicketTypeIds.has(line.ticketTypeId)) {
+        throw new BadRequestException(
+          'No puedes repetir la misma localidad en la misma orden',
+        );
+      }
+      seenTicketTypeIds.add(line.ticketTypeId);
+      
       ticketType.remaining -= line.quantity;
 
       if (line.quantity > ticketType.maxPerOrder) {
