@@ -110,8 +110,9 @@ export class OrdersService {
       status: 'pending',
       items,
       subtotalCents,
+      discountCents,
       feeCents,
-      totalCents: subtotalCents + feeCents,
+      totalCents: discountedSubtotalCents + feeCents,
       buyer: null,
       createdAt: new Date().toISOString(),
     };
