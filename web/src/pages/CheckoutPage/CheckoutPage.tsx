@@ -104,7 +104,7 @@ export function CheckoutPage() {
         promoCode: values.promoCode || undefined,
       });
 
-      setBuyerInfo(values);
+      setBuyerInfo({ name: values.name, email: values.email });
       setOrderId(order.id);
     } catch (error) {
       setErrorMessage((error as Error).message);
