@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import * as yup from 'yup';
@@ -60,6 +60,20 @@ export function CheckoutPage() {
     useApiMutation<Order, { id: string }, ConfirmOrderBody>(confirmOrder, {
       id: orderId ?? '',
     });
+
+  
+
+  useEffect(() => {
+    if (!orderId || !buyerInfo) return;
+
+    confirmOrderRequest(buyerInfo)
+      .then((confirmedOrder) => {
+        navigate(`/orders/${confirmedOrder.id}`);
+      })
+      .catch((error: Error) => {
+        setErrorMessage(error.message);
+      });
+  }, [orderId, buyerInfo]);
 
   if (!selection?.items.length) {
     return <Navigate to="/" replace />;
