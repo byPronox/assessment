@@ -33,6 +33,7 @@ const checkoutSchema = yup.object({
     .trim()
     .email('Ingresa un correo válido')
     .required('Ingresa tu correo'),
+  promoCode: yup.string().trim().optional(),
 });
 
 type CheckoutFormValues = yup.InferType<typeof checkoutSchema>;
@@ -145,6 +146,19 @@ export function CheckoutPage() {
             {errors.email && (
               <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
             )}
+          </div>
+
+          <div>
+            <label htmlFor="promoCode" className="block text-sm font-medium">
+              Código de descuento (opcional)
+            </label>
+            <input
+              id="promoCode"
+              type="text"
+              placeholder="SAVE10"
+              {...register('promoCode')}
+              className="mt-1 w-full rounded-lg border border-ink/15 px-3 py-2 text-sm uppercase"
+            />
           </div>
 
           {errorMessage && (
