@@ -13,6 +13,10 @@ import { AppStore, Order } from '../store/store';
 /** Service fee applied on top of the ticket subtotal. */
 export const SERVICE_FEE_PERCENT = 10;
 
+const PROMO_CODES: Record<string, number> = {
+  SAVE10: 10,
+};
+
 @Injectable()
 export class OrdersService {
   constructor(@Inject(APP_STORE) private readonly store: AppStore) {}
@@ -82,13 +86,23 @@ export class OrdersService {
       };
     });
 
-    const subtotalCents = items.reduce(
-      (sum, item) => sum + item.lineTotalCents,
-      0,
-    );
+    const subtotalCents = items.reduce((sum, item) => sum + item.lineTotalCents, 0 );
 
-    // TODO: feeCents should be SERVICE_FEE_PERCENT of subtotalCents, rounded
-    const feeCents = Math.round((subtotalCents * SERVICE_FEE_PERCENT) / 100);
+    let discountCents = 0;
+
+    if (dto.promoCode) {
+      const discountPercent = PROMO_CODES[dto.promoCode.toUpperCase()];
+
+      if (discountPercent === undefined) {
+        throw new BadRequestException('Código de descuento no válido');
+      }
+
+      discountCents = Math.round((subtotalCents * discountPercent) / 100);
+    }
+
+    const discountedSubtotalCents = subtotalCents - discountCents;
+    
+    const feeCents = Math.round((discountedSubtotalCents * SERVICE_FEE_PERCENT) / 100);
 
     const order: Order = {
       id: `ord_${randomUUID()}`,
