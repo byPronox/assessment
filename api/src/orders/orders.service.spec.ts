@@ -182,5 +182,27 @@ describe('OrdersService', () => {
         }),
       ).toThrow(BadRequestException);
     });
+
+    it('aplies SAVE10 promo  code as 10% off the subtotal', () => {
+      const order = service.create({
+        eventId: 'noche-salsa',
+        items: [{ ticketTypeId: 'salsa-general', quantity: 2 }],
+        promoCode: 'save10',
+      });
+
+      expect(order.discountCents).toBe(500);
+      expect(order.feeCents).toBe(450);
+      expect(order.totalCents).toBe(4950);
+    });
+
+    it('rejects an invalid promo code ', () => {
+      expect(() =>
+        service.create({
+          eventId: 'noche-salsa',
+          items: [{ ticketTypeId: 'salsa-general', quantity: 1 }],
+          promoCode: 'FAKE',
+        }),
+      ).toThrow(BadRequestException);
+    });
   });
 });
