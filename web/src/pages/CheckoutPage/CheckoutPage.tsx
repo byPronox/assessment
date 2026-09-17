@@ -6,6 +6,7 @@ import * as yup from 'yup';
 import { confirmOrder, createOrder, useApiMutation } from '~/api';
 import type { ConfirmOrderBody } from '~/api/endpoints/orders/confirmOrder';
 import type { CreateOrderBody } from '~/api/endpoints/orders/createOrder';
+import { feeFromSubtotal } from '~/lib/money';
 import { CheckoutState, Order } from '~/types';
 
 /**
@@ -78,6 +79,33 @@ export function CheckoutPage() {
   if (!selection?.items.length) {
     return <Navigate to="/" replace />;
   }
+
+  const subtotalCents = selection.items.reduce(
+    (sum, item) => sum + item.unitPriceCents * item.quantity,
+    0,
+  );
+  const feeCents = feeFromSubtotal(subtotalCents);
+  const totalCents = subtotalCents + feeCents;
+  const isSubmitting = isCreating || isConfirming;
+
+  const onSubmit = async (values: CheckoutFormValues) => {
+    setErrorMessage(null);
+
+    try {
+      const order = await createOrderRequest({
+        eventId: selection.eventId,
+        items: selection.items.map((item) => ({
+          ticketTypeId: item.ticketTypeId,
+          quantity: item.quantity,
+        })),
+      });
+
+      setBuyerInfo(values);
+      setOrderId(order.id);
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+    }
+  };
 
   return (
     <main className="mx-auto grid max-w-5xl gap-8 px-4 py-10 md:grid-cols-[1fr_280px]">
